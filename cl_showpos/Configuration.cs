@@ -1,6 +1,7 @@
 ﻿using Dalamud.Configuration;
 using Dalamud.Plugin;
 using System;
+using System.Numerics;
 
 namespace cl_showpos {
     [Serializable]
@@ -8,6 +9,8 @@ namespace cl_showpos {
         public int Version { get; set; } = 0;
 
         public bool DrawShowpos { get; set; } = true;
+        public Vector4 ShowposColor { get; set; } = new(1, 1, 1, 1);
+        public float FontSize { get; set; } = 1;
 
         [NonSerialized] private DalamudPluginInterface? pluginInterface;
 

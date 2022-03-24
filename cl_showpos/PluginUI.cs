@@ -65,7 +65,7 @@ namespace cl_showpos {
             // calc font size
             var windowSize = ImGui.CalcTextSize(str) * configuration.FontSize + new Vector2(25, 25);
             ImGui.SetNextWindowSize(windowSize);
-            
+
             // change window position
             var windowPos = new Vector2(0, 0);
             var screenSize = ImGui.GetIO().DisplaySize;

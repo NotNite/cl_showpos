@@ -58,21 +58,40 @@ namespace cl_showpos {
 
                 str = $"{nameStr}\n{posStr}\n{angStr}\n{velStr}";
             }
-            
+
             ImGui.PushFont(UiBuilder.MonoFont);
             ImGui.PushStyleColor(ImGuiCol.Text, configuration.ShowposColor);
 
             // calc font size
             var windowSize = ImGui.CalcTextSize(str) * configuration.FontSize + new Vector2(25, 25);
-
-            ImGui.SetNextWindowPos(new Vector2(0, 0));
             ImGui.SetNextWindowSize(windowSize);
+            
+            // change window position
+            var windowPos = new Vector2(0, 0);
+            var screenSize = ImGui.GetIO().DisplaySize;
+
+            switch (configuration.Position) {
+                case ShowposPosition.TopLeft:
+                    windowPos = new Vector2(0, 0);
+                    break;
+                case ShowposPosition.TopRight:
+                    windowPos = new Vector2(screenSize.X - windowSize.X, 0);
+                    break;
+                case ShowposPosition.BottomLeft:
+                    windowPos = new Vector2(0, screenSize.Y - windowSize.Y);
+                    break;
+                case ShowposPosition.BottomRight:
+                    windowPos = new Vector2(screenSize.X - windowSize.X, screenSize.Y - windowSize.Y);
+                    break;
+            }
+
+            ImGui.SetNextWindowPos(windowPos);
 
             if (ImGui.Begin("##cl_showpos", ShowposFlags)) {
                 ImGui.SetWindowFontScale(configuration.FontSize);
                 ImGui.TextUnformatted(str);
             }
-            
+
             ImGui.PopStyleColor();
             ImGui.PopFont();
             ImGui.End();
@@ -81,7 +100,7 @@ namespace cl_showpos {
         private void DrawSettingsWindow() {
             if (!SettingsVisible) return;
 
-            ImGui.SetNextWindowSize(new Vector2(250, 125), ImGuiCond.Always);
+            ImGui.SetNextWindowSize(new Vector2(250, 150), ImGuiCond.Always);
             if (ImGui.Begin("cl_showpos settings", ref settingsVisible,
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoScrollWithMouse)) {
@@ -100,6 +119,13 @@ namespace cl_showpos {
                 var size = configuration.FontSize;
                 if (ImGui.SliderFloat("Font size", ref size, 0, 10)) {
                     configuration.FontSize = size;
+                    configuration.Save();
+                }
+
+                var pos = (int) configuration.Position;
+                var posNames = Enum.GetNames<ShowposPosition>();
+                if (ImGui.Combo("Position", ref pos, posNames, posNames.Length)) {
+                    configuration.Position = (ShowposPosition) pos;
                     configuration.Save();
                 }
             }

@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Authors>NotNite</Authors>
-    <Version>1.0.2.1</Version>
+    <Version>1.0.3.1</Version>
     <Description>the source engine convar, implemented into FFXIV</Description>
     <PackageProjectUrl>https://gitlab.com/jules/cl_showpos</PackageProjectUrl>
     <RootNamespace>cl_showpos</RootNamespace>

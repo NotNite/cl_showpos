@@ -1,7 +1,7 @@
-﻿using ImGuiNET;
-using System;
+﻿using System;
 using System.Numerics;
 using Dalamud.Interface;
+using ImGuiNET;
 
 namespace cl_showpos {
     internal class PluginUI : IDisposable {
@@ -41,23 +41,31 @@ namespace cl_showpos {
 
             // it is midnight can you tell
             var localPlayer = Plugin.ClientState.LocalPlayer;
-            string str;
+            var str = "";
 
             if (localPlayer == null) {
-                str = "name: unconnected\npos: 0.00 0.00 0.00\nang: 0.00 0.00 0.00\nvel: 0.00";
+                str += "name: unconnected";
+                str += "\npos: 0.00 0.00 0.00";
+                str += "\nang: 0.00 0.00 0.00";
+                str += "\nvel: 0.00";
             } else {
                 var nameStr = "name: " + localPlayer.Name;
-                var posStr = "pos: " + Vec3ToString(localPlayer.Position);
+                str += nameStr;
+
+                var posStr = "\npos: " + Vec3ToString(localPlayer.Position);
+                str += posStr;
 
                 var ang = localPlayer.Rotation * (180 / Math.PI);
-                var angStr = $"ang: 0.00 {ang:0.00} 0.00";
+                var angStr = $"\nang: 0.00 {ang:0.00} 0.00";
+                str += angStr;
 
                 var updateFreq = 1000 / Plugin.Framework.UpdateDelta.Milliseconds;
                 var vel = (Plugin.LastPosition - localPlayer.Position) * updateFreq;
-                var velStr = $"vel: {vel.Length():0.00}";
-
-                str = $"{nameStr}\n{posStr}\n{angStr}\n{velStr}";
+                var velStr = $"\nvel: {vel.Length():0.00}";
+                str += velStr;
             }
+
+            if (configuration.DrawTerritory) str += $"\nteri: {Plugin.ClientState.TerritoryType}";
 
             ImGui.PushFont(UiBuilder.MonoFont);
             ImGui.PushStyleColor(ImGuiCol.Text, configuration.ShowposColor);
@@ -85,6 +93,8 @@ namespace cl_showpos {
                     break;
             }
 
+            windowPos += new Vector2(configuration.OffsetX, configuration.OffsetY);
+
             ImGui.SetNextWindowPos(windowPos);
 
             if (ImGui.Begin("##cl_showpos", ShowposFlags)) {
@@ -100,13 +110,19 @@ namespace cl_showpos {
         private void DrawSettingsWindow() {
             if (!SettingsVisible) return;
 
-            ImGui.SetNextWindowSize(new Vector2(250, 150), ImGuiCond.Always);
+            ImGui.SetNextWindowSize(new Vector2(250, 200) * ImGuiHelpers.GlobalScale, ImGuiCond.Always);
             if (ImGui.Begin("cl_showpos settings", ref settingsVisible,
-                ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
-                ImGuiWindowFlags.NoScrollWithMouse)) {
+                    ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
+                    ImGuiWindowFlags.NoScrollWithMouse)) {
                 var enabled = configuration.DrawShowpos;
                 if (ImGui.Checkbox("Enabled", ref enabled)) {
                     configuration.DrawShowpos = enabled;
+                    configuration.Save();
+                }
+
+                var drawTeri = configuration.DrawTerritory;
+                if (ImGui.Checkbox("Show territory ID", ref drawTeri)) {
+                    configuration.DrawTerritory = drawTeri;
                     configuration.Save();
                 }
 
@@ -126,6 +142,14 @@ namespace cl_showpos {
                 var posNames = Enum.GetNames<ShowposPosition>();
                 if (ImGui.Combo("Position", ref pos, posNames, posNames.Length)) {
                     configuration.Position = (ShowposPosition) pos;
+                    configuration.Save();
+                }
+
+                // https://github.com/mellinoe/ImGui.NET/issues/181 ???
+                var wtfImguiNet = new[] {configuration.OffsetX, configuration.OffsetY};
+                if (ImGui.InputInt2("Offset", ref wtfImguiNet[0])) {
+                    configuration.OffsetX = wtfImguiNet[0];
+                    configuration.OffsetY = wtfImguiNet[1];
                     configuration.Save();
                 }
             }

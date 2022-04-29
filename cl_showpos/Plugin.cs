@@ -1,9 +1,9 @@
 ﻿using System.Numerics;
 using Dalamud.Game;
+using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using Dalamud.Game.ClientState;
 
 namespace cl_showpos {
     public sealed class Plugin : IDalamudPlugin {

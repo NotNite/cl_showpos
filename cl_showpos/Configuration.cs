@@ -20,6 +20,11 @@ namespace cl_showpos {
         public float FontSize { get; set; } = 1;
         public ShowposPosition Position { get; set; } = ShowposPosition.TopLeft;
 
+        public int OffsetX { get; set; } = 0;
+        public int OffsetY { get; set; } = 0;
+
+        public bool DrawTerritory { get; set; } = false;
+
         [NonSerialized] private DalamudPluginInterface? pluginInterface;
 
         public void Initialize(DalamudPluginInterface pluginInterface) {

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Dalamud.Data;
 using Dalamud.Game;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
@@ -16,6 +17,7 @@ namespace cl_showpos {
         [PluginService] public static CommandManager CommandManager { get; private set; }
         [PluginService] public static ClientState ClientState { get; private set; }
         [PluginService] public static Framework Framework { get; private set; }
+        [PluginService] public static DataManager DataManager { get; private set; }
 
         public static Configuration Configuration { get; private set; }
         private PluginUI PluginUI { get; }
@@ -23,6 +25,7 @@ namespace cl_showpos {
         public static Vector3 LastPosition = Vector3.Zero;
 
         public Plugin() {
+           
             Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             Configuration.Initialize(PluginInterface);
 

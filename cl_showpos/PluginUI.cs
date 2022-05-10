@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Numerics;
+using cl_showpos.Utils;
 using Dalamud.Interface;
 using ImGuiNET;
+using Lumina.Excel.GeneratedSheets;
 
 namespace cl_showpos {
     internal class PluginUI : IDisposable {
@@ -32,10 +34,6 @@ namespace cl_showpos {
             DrawSettingsWindow();
         }
 
-        private string Vec3ToString(Vector3 vec) {
-            return $"{vec.X:0.00} {vec.Y:0.00} {vec.Z:0.00}";
-        }
-
         private void DrawShowpos() {
             if (!configuration.DrawShowpos) return;
 
@@ -49,11 +47,17 @@ namespace cl_showpos {
                 str += "\nang: 0.00 0.00 0.00";
                 str += "\nvel: 0.00";
             } else {
+                var territoryId = Plugin.ClientState.TerritoryType;
+                var territory = Plugin.DataManager.GetExcelSheet<TerritoryType>()!.GetRow(territoryId)!;
+                var map = territory.Map.Value!;
+                
                 var nameStr = "name: " + localPlayer.Name;
                 str += nameStr;
 
-                var posStr = "\npos: " + Vec3ToString(localPlayer.Position);
+                var posStr = "\npos: " + localPlayer.Position.ToString(this.configuration.PositionPrecision);
                 str += posStr;
+
+                str += $"\ncrd: {localPlayer.Position.ToGameMinimapCoords(map).ToString(this.configuration.PositionPrecision)}";
 
                 var ang = localPlayer.Rotation * (180 / Math.PI);
                 var angStr = $"\nang: 0.00 {ang:0.00} 0.00";
@@ -63,9 +67,11 @@ namespace cl_showpos {
                 var vel = (Plugin.LastPosition - localPlayer.Position) * updateFreq;
                 var velStr = $"\nvel: {vel.Length():0.00}";
                 str += velStr;
+                
+                if (configuration.DrawTerritory) {
+                    str += $"\nteri: {territory.Bg} ({Plugin.ClientState.TerritoryType})";
+                }
             }
-
-            if (configuration.DrawTerritory) str += $"\nteri: {Plugin.ClientState.TerritoryType}";
 
             ImGui.PushFont(UiBuilder.MonoFont);
             ImGui.PushStyleColor(ImGuiCol.Text, configuration.ShowposColor);
@@ -110,7 +116,7 @@ namespace cl_showpos {
         private void DrawSettingsWindow() {
             if (!SettingsVisible) return;
 
-            ImGui.SetNextWindowSize(new Vector2(250, 200) * ImGuiHelpers.GlobalScale, ImGuiCond.Always);
+            ImGui.SetNextWindowSize(new Vector2(250, 250) * ImGuiHelpers.GlobalScale, ImGuiCond.Always);
             if (ImGui.Begin("cl_showpos settings", ref settingsVisible,
                     ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
                     ImGuiWindowFlags.NoScrollWithMouse)) {
@@ -151,6 +157,12 @@ namespace cl_showpos {
                     configuration.OffsetX = wtfImguiNet[0];
                     configuration.OffsetY = wtfImguiNet[1];
                     configuration.Save();
+                }
+
+                var precision = this.configuration.PositionPrecision;
+                if (ImGui.SliderInt("Precision", ref precision, 0, 8)) {
+                    this.configuration.PositionPrecision = precision;
+                    this.configuration.Save();
                 }
             }
 

@@ -27,7 +27,8 @@ namespace cl_showpos {
             this.configuration = configuration;
         }
 
-        public void Dispose() { }
+        public void Dispose() {
+        }
 
         public void Draw() {
             DrawShowpos();
@@ -41,35 +42,52 @@ namespace cl_showpos {
             var localPlayer = Plugin.ClientState.LocalPlayer;
             var str = "";
 
+            var zero = 0.ToString($"F{configuration.PositionPrecision}");
+
             if (localPlayer == null) {
                 str += "name: unconnected";
-                str += "\npos: 0.00 0.00 0.00";
-                str += "\nang: 0.00 0.00 0.00";
-                str += "\nvel: 0.00";
+                str += $"\npos: {zero} {zero} {zero}";
+                if (configuration.DrawMapCoords) str += $"\ncrd: {zero} {zero} {zero}";
+                str += $"\nang: {zero} {zero} {zero}";
+                str += $"\nvel: {zero}";
             } else {
                 var territoryId = Plugin.ClientState.TerritoryType;
                 var territory = Plugin.DataManager.GetExcelSheet<TerritoryType>()!.GetRow(territoryId)!;
                 var map = territory.Map.Value!;
-                
+
+                // name
                 var nameStr = "name: " + localPlayer.Name;
                 str += nameStr;
 
-                var posStr = "\npos: " + localPlayer.Position.ToString(this.configuration.PositionPrecision);
+                // pos
+                var posStr = "\npos: " + localPlayer.Position.ToString(configuration.PositionPrecision);
                 str += posStr;
 
-                str += $"\ncrd: {localPlayer.Position.ToGameMinimapCoords(map).ToString(this.configuration.PositionPrecision, true)}";
+                // crd
+                if (configuration.DrawMapCoords) {
+                    str +=
+                        $"\ncrd: {localPlayer.Position.ToGameMinimapCoords(map).ToString(configuration.PositionPrecision, true)}";
+                }
 
-                var ang = localPlayer.Rotation * (180 / Math.PI);
-                var angStr = $"\nang: 0.00 {ang:0.00} 0.00";
+                // ang
+                var ang = (localPlayer.Rotation * (180 / Math.PI)).ToString($"F{configuration.PositionPrecision}");
+                var angStr = $"\nang: {zero} {ang} {zero}";
                 str += angStr;
 
+                // vel
                 var updateFreq = 1000 / Plugin.Framework.UpdateDelta.Milliseconds;
                 var vel = (Plugin.LastPosition - localPlayer.Position) * updateFreq;
-                var velStr = $"\nvel: {vel.Length():0.00}";
+                var velLen = vel.Length().ToString($"F{configuration.PositionPrecision}");
+                var velStr = $"\nvel: {velLen}";
                 str += velStr;
-                
+
+                // teri
                 if (configuration.DrawTerritory) {
-                    str += $"\nteri: {territory.Bg} ({Plugin.ClientState.TerritoryType})";
+                    if (configuration.DrawLongTerritory) {
+                        str += $"\nteri: {territory.Bg} ({Plugin.ClientState.TerritoryType})";
+                    } else {
+                        str += $"\nteri: {Plugin.ClientState.TerritoryType}";
+                    }
                 }
             }
 
@@ -116,7 +134,7 @@ namespace cl_showpos {
         private void DrawSettingsWindow() {
             if (!SettingsVisible) return;
 
-            ImGui.SetNextWindowSize(new Vector2(250, 250) * ImGuiHelpers.GlobalScale, ImGuiCond.Always);
+            ImGui.SetNextWindowSize(new Vector2(250, 275) * ImGuiHelpers.GlobalScale, ImGuiCond.Always);
             if (ImGui.Begin("cl_showpos settings", ref settingsVisible,
                     ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
                     ImGuiWindowFlags.NoScrollWithMouse)) {
@@ -132,6 +150,20 @@ namespace cl_showpos {
                     configuration.Save();
                 }
 
+                if (configuration.DrawTerritory) {
+                    var drawLongTeri = configuration.DrawLongTerritory;
+                    if (ImGui.Checkbox("Show territory path", ref drawLongTeri)) {
+                        configuration.DrawLongTerritory = drawLongTeri;
+                        configuration.Save();
+                    }
+                }
+
+                var drawCrd = configuration.DrawMapCoords;
+                if (ImGui.Checkbox("Show map coordinates", ref drawCrd)) {
+                    configuration.DrawMapCoords = drawCrd;
+                    configuration.Save();
+                }
+
                 var color = configuration.ShowposColor;
                 if (ImGui.ColorEdit4("Text color", ref color, ImGuiColorEditFlags.NoInputs)) {
                     configuration.ShowposColor = color;
@@ -144,15 +176,15 @@ namespace cl_showpos {
                     configuration.Save();
                 }
 
-                var pos = (int) configuration.Position;
+                var pos = (int)configuration.Position;
                 var posNames = Enum.GetNames<ShowposPosition>();
                 if (ImGui.Combo("Position", ref pos, posNames, posNames.Length)) {
-                    configuration.Position = (ShowposPosition) pos;
+                    configuration.Position = (ShowposPosition)pos;
                     configuration.Save();
                 }
 
                 // https://github.com/mellinoe/ImGui.NET/issues/181 ???
-                var wtfImguiNet = new[] {configuration.OffsetX, configuration.OffsetY};
+                var wtfImguiNet = new[] { configuration.OffsetX, configuration.OffsetY };
                 if (ImGui.InputInt2("Offset", ref wtfImguiNet[0])) {
                     configuration.OffsetX = wtfImguiNet[0];
                     configuration.OffsetY = wtfImguiNet[1];

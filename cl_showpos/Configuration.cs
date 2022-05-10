@@ -24,6 +24,9 @@ namespace cl_showpos {
         public int OffsetY { get; set; } = 0;
 
         public bool DrawTerritory { get; set; } = false;
+        public bool DrawLongTerritory { get; set; } = false;
+
+        public bool DrawMapCoords { get; set; } = false;
 
         public int PositionPrecision { get; set; } = 3;
 

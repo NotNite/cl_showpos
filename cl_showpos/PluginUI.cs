@@ -57,7 +57,7 @@ namespace cl_showpos {
                 var posStr = "\npos: " + localPlayer.Position.ToString(this.configuration.PositionPrecision);
                 str += posStr;
 
-                str += $"\ncrd: {localPlayer.Position.ToGameMinimapCoords(map).ToString(this.configuration.PositionPrecision)}";
+                str += $"\ncrd: {localPlayer.Position.ToGameMinimapCoords(map).ToString(this.configuration.PositionPrecision, true)}";
 
                 var ang = localPlayer.Rotation * (180 / Math.PI);
                 var angStr = $"\nang: 0.00 {ang:0.00} 0.00";

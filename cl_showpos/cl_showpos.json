@@ -3,7 +3,12 @@
   "Name": "cl_showpos",
   "Description": "the source engine convar, implemented into FFXIV",
   "InternalName": "cl_showpos",
+  "RepoUrl": "https://gitlab.com/jules/cl_showpos",
   "ApplicableVersion": "any",
-  "Tags": ["ui"],
-  "CategoryTags": ["ui"]
+  "Tags": [
+    "ui"
+  ],
+  "CategoryTags": [
+    "ui"
+  ]
 }

@@ -25,7 +25,6 @@ namespace cl_showpos {
         public static Vector3 LastPosition = Vector3.Zero;
 
         public Plugin() {
-           
             Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             Configuration.Initialize(PluginInterface);
 

@@ -25,6 +25,8 @@ namespace cl_showpos {
 
         public bool DrawTerritory { get; set; } = false;
 
+        public int PositionPrecision { get; set; } = 3;
+
         [NonSerialized] private DalamudPluginInterface? pluginInterface;
 
         public void Initialize(DalamudPluginInterface pluginInterface) {

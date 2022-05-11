@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using cl_showpos.Game;
 using cl_showpos.Utils;
 using Dalamud.Interface;
 using ImGuiNET;
@@ -53,7 +54,7 @@ namespace cl_showpos {
             } else {
                 var territoryId = Plugin.ClientState.TerritoryType;
                 var territory = Plugin.DataManager.GetExcelSheet<TerritoryType>()!.GetRow(territoryId)!;
-                var map = territory.Map.Value!;
+                var map = Plugin.DataManager.GetExcelSheet<Map>()!.GetRow(MapHelper.CurrentMapId());
 
                 // name
                 var nameStr = "name: " + localPlayer.Name;
@@ -64,7 +65,7 @@ namespace cl_showpos {
                 str += posStr;
 
                 // crd
-                if (configuration.DrawMapCoords) {
+                if (configuration.DrawMapCoords && map != null) {
                     str +=
                         $"\ncrd: {localPlayer.Position.ToGameMinimapCoords(map).ToString(configuration.PositionPrecision, true)}";
                 }

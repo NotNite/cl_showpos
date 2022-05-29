@@ -1,5 +1,3 @@
 # cl_showpos
 
-the `cl_showpos` source engine convar, implemented into FFXIV via [Dalamud](https://github.com/goatcorp/Dalamud)
-
-i sincerely apologize for this code quality
+A [Dalamud](https://github.com/goatcorp/Dalamud) plugin that adds customizable, Source Engine-styled position info. Based off of the cl_showpos command from the Source Engine.

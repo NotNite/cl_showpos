@@ -6,7 +6,7 @@ namespace cl_showpos.Utils;
 public static class Utils {
     private static float RoundDown(float i, double decimalPlaces) {
         var power = Convert.ToDecimal(Math.Pow(10, decimalPlaces));
-        return (float)(Math.Truncate((decimal)i * power) / power);
+        return (float)(Math.Floor((decimal)i * power) / power);
     }
 
     public static string ToString(this Vector3 vec, int precision, bool floor = false) {

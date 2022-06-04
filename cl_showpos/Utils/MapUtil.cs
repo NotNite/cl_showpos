@@ -22,9 +22,6 @@ public static class MapUtil {
 
         var adjustedValue = value - zOffset;
 
-        if (adjustedValue < 0)
-            adjustedValue -= 10;
-
         return adjustedValue / 100f;
     }
 

@@ -28,7 +28,7 @@ namespace cl_showpos {
             Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             Configuration.Initialize(PluginInterface);
 
-            PluginUI = new PluginUI(Configuration);
+            PluginUI = new PluginUI();
 
             CommandManager.AddHandler(commandName, new CommandInfo(OnCommand) {
                 HelpMessage = "Open the settings menu"

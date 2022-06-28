@@ -25,6 +25,7 @@ namespace cl_showpos {
 
         public bool DrawTerritory { get; set; } = false;
         public bool DrawLongTerritory { get; set; } = false;
+        public bool DrawTerritoryName { get; set; } = false;
 
         public bool DrawMapCoords { get; set; } = false;
 

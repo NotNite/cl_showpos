@@ -4,6 +4,7 @@ using cl_showpos.Game;
 using cl_showpos.Utils;
 using Dalamud.Interface;
 using ImGuiNET;
+using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 
 namespace cl_showpos {
@@ -19,13 +20,16 @@ namespace cl_showpos {
 
         private bool settingsVisible = false;
 
+        private ExcelSheet<TerritoryTypeTransient> _transientSheet;
+
         public bool SettingsVisible {
             get => settingsVisible;
             set => settingsVisible = value;
         }
 
-        public PluginUI(Configuration configuration) {
-            this.configuration = configuration;
+        public PluginUI() {
+            this.configuration = Plugin.Configuration;
+            this._transientSheet = Plugin.DataManager.Excel.GetSheet<TerritoryTypeTransient>()!;
         }
 
         public void Dispose() {
@@ -66,8 +70,10 @@ namespace cl_showpos {
 
                 // crd
                 if (configuration.DrawMapCoords && map != null) {
-                    str +=
-                        $"\ncrd: {localPlayer.Position.ToGameMinimapCoords(map).ToString(configuration.PositionPrecision, true)}";
+                    var ttc = _transientSheet.GetRow(map.TerritoryType.Row)!;
+                    var mapCoords = Dalamud.Utility.MapUtil.WorldToMap(localPlayer.Position, map, ttc, true);
+                    
+                    str += $"\ncrd: {mapCoords.ToString(configuration.PositionPrecision, true)}";
                 }
 
                 // ang
@@ -88,6 +94,11 @@ namespace cl_showpos {
                         str += $"\nteri: {territory.Bg} ({Plugin.ClientState.TerritoryType})";
                     } else {
                         str += $"\nteri: {Plugin.ClientState.TerritoryType}";
+                    }
+
+                    if (configuration.DrawTerritoryName) {
+                        str += $"\ntern: {territory.PlaceNameRegion.Value?.Name} > " +
+                               $"{territory.PlaceName.Value?.Name}";
                     }
                 }
             }
@@ -135,7 +146,7 @@ namespace cl_showpos {
         private void DrawSettingsWindow() {
             if (!SettingsVisible) return;
 
-            ImGui.SetNextWindowSize(new Vector2(250, 275) * ImGuiHelpers.GlobalScale, ImGuiCond.Always);
+            ImGui.SetNextWindowSize(new Vector2(250, 350) * ImGuiHelpers.GlobalScale, ImGuiCond.Always);
             if (ImGui.Begin("cl_showpos settings", ref settingsVisible,
                     ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
                     ImGuiWindowFlags.NoScrollWithMouse)) {
@@ -152,11 +163,21 @@ namespace cl_showpos {
                 }
 
                 if (configuration.DrawTerritory) {
+                    ImGui.Indent();
+                    
                     var drawLongTeri = configuration.DrawLongTerritory;
-                    if (ImGui.Checkbox("Show territory path", ref drawLongTeri)) {
+                    if (ImGui.Checkbox("Show path", ref drawLongTeri)) {
                         configuration.DrawLongTerritory = drawLongTeri;
                         configuration.Save();
                     }
+
+                    var drawTeriName = configuration.DrawTerritoryName;
+                    if (ImGui.Checkbox("Show name", ref drawTeriName)) {
+                        configuration.DrawTerritoryName = drawTeriName;
+                        configuration.Save();
+                    }
+                    
+                    ImGui.Unindent();
                 }
 
                 var drawCrd = configuration.DrawMapCoords;

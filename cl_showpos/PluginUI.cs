@@ -3,6 +3,7 @@ using System.Numerics;
 using cl_showpos.Game;
 using cl_showpos.Utils;
 using Dalamud.Interface;
+using Dalamud.Logging;
 using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
@@ -32,8 +33,7 @@ namespace cl_showpos {
             this._transientSheet = Plugin.DataManager.Excel.GetSheet<TerritoryTypeTransient>()!;
         }
 
-        public void Dispose() {
-        }
+        public void Dispose() { }
 
         public void Draw() {
             DrawShowpos();
@@ -70,9 +70,11 @@ namespace cl_showpos {
 
                 // crd
                 if (configuration.DrawMapCoords && map != null) {
-                    var ttc = _transientSheet.GetRow(map.TerritoryType.Row)!;
-                    var mapCoords = Dalamud.Utility.MapUtil.WorldToMap(localPlayer.Position, map, ttc, true);
+                    var ttc = _transientSheet.GetRow(map.TerritoryType.Row);
                     
+                    var mapCoords = Dalamud.Utility.MapUtil.WorldToMap(localPlayer.Position, map.OffsetX, map.OffsetY,
+                        ttc?.OffsetZ ?? 0, map.SizeFactor, true);
+
                     str += $"\ncrd: {mapCoords.ToString(configuration.PositionPrecision, true)}";
                 }
 
@@ -164,7 +166,7 @@ namespace cl_showpos {
 
                 if (configuration.DrawTerritory) {
                     ImGui.Indent();
-                    
+
                     var drawLongTeri = configuration.DrawLongTerritory;
                     if (ImGui.Checkbox("Show path", ref drawLongTeri)) {
                         configuration.DrawLongTerritory = drawLongTeri;
@@ -176,7 +178,7 @@ namespace cl_showpos {
                         configuration.DrawTerritoryName = drawTeriName;
                         configuration.Save();
                     }
-                    
+
                     ImGui.Unindent();
                 }
 
@@ -198,15 +200,15 @@ namespace cl_showpos {
                     configuration.Save();
                 }
 
-                var pos = (int)configuration.Position;
+                var pos = (int) configuration.Position;
                 var posNames = Enum.GetNames<ShowposPosition>();
                 if (ImGui.Combo("Position", ref pos, posNames, posNames.Length)) {
-                    configuration.Position = (ShowposPosition)pos;
+                    configuration.Position = (ShowposPosition) pos;
                     configuration.Save();
                 }
 
                 // https://github.com/mellinoe/ImGui.NET/issues/181 ???
-                var wtfImguiNet = new[] { configuration.OffsetX, configuration.OffsetY };
+                var wtfImguiNet = new[] {configuration.OffsetX, configuration.OffsetY};
                 if (ImGui.InputInt2("Offset", ref wtfImguiNet[0])) {
                     configuration.OffsetX = wtfImguiNet[0];
                     configuration.OffsetY = wtfImguiNet[1];

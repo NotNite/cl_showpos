@@ -6,6 +6,7 @@
         <Description>the source engine convar, implemented into FFXIV</Description>
         <PackageProjectUrl>https://gitlab.com/jules/cl_showpos</PackageProjectUrl>
         <RootNamespace>cl_showpos</RootNamespace>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     </PropertyGroup>
 
     <PropertyGroup>

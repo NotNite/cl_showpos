@@ -51,8 +51,11 @@ namespace cl_showpos {
             var zero = 0.ToString($"F{configuration.PositionPrecision}");
 
             if (localPlayer == null) {
-                str += "name: unconnected";
-                str += $"\npos: {zero} {zero} {zero}";
+                if (configuration.DrawName) {
+                    str += "name: unconnected\n";
+                }
+                
+                str += $"pos: {zero} {zero} {zero}";
                 if (configuration.DrawMapCoords) str += $"\ncrd: {zero} {zero} {zero}";
                 str += $"\nang: {zero} {zero} {zero}";
                 str += $"\nvel: {zero}";
@@ -62,11 +65,13 @@ namespace cl_showpos {
                 var map = Plugin.DataManager.GetExcelSheet<Map>()!.GetRow(MapHelper.CurrentMapId());
 
                 // name
-                var nameStr = "name: " + localPlayer.Name;
-                str += nameStr;
+                if (configuration.DrawName) {
+                    var nameStr = "name: " + localPlayer.Name + "\n";
+                    str += nameStr;
+                }
 
                 // pos
-                var posStr = "\npos: " + localPlayer.Position.ToString(configuration.PositionPrecision);
+                var posStr = "pos: " + localPlayer.Position.ToString(configuration.PositionPrecision);
                 str += posStr;
 
                 // crd
@@ -156,6 +161,12 @@ namespace cl_showpos {
                 var enabled = configuration.DrawShowpos;
                 if (ImGui.Checkbox("Enabled", ref enabled)) {
                     configuration.DrawShowpos = enabled;
+                    configuration.Save();
+                }
+
+                var drawName = configuration.DrawName;
+                if (ImGui.Checkbox("Draw name", ref drawName)) {
+                    configuration.DrawName = drawName;
                     configuration.Save();
                 }
 

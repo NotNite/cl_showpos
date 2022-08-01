@@ -23,6 +23,7 @@ namespace cl_showpos {
         public int OffsetX { get; set; } = 0;
         public int OffsetY { get; set; } = 0;
 
+        public bool DrawName { get; set; } = true;
         public bool DrawTerritory { get; set; } = false;
         public bool DrawLongTerritory { get; set; } = false;
         public bool DrawTerritoryName { get; set; } = false;

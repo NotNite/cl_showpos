@@ -4,7 +4,7 @@
   "Punchline": "Customizable, Source Engine-styled position info",
   "Description": "Shows your exact position, rotation, and velocity on screen. Based off of the cl_showpos command from the Source Engine.",
   "InternalName": "cl_showpos",
-  "RepoUrl": "https://gitlab.com/jules/cl_showpos",
+  "RepoUrl": "https://github.com/NotNite/cl_showpos",
   "ApplicableVersion": "any",
   "Tags": ["ui"],
   "CategoryTags": ["ui"]

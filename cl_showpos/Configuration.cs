@@ -1,5 +1,4 @@
 ﻿using Dalamud.Configuration;
-using Dalamud.Plugin;
 using System;
 using System.Numerics;
 
@@ -30,14 +29,12 @@ public class Configuration : IPluginConfiguration {
     public bool DrawTerritoryName = false;
     public bool DrawMapCoords = false;
 
+    public bool ShowWhenNoPlayer = true;
+    public bool SourceAuthenticity = true;
+
     public int PositionPrecision = 3;
 
-    [NonSerialized] private DalamudPluginInterface pluginInterface = null!;
-    public void Initialize(DalamudPluginInterface pi) {
-        this.pluginInterface = pi;
-    }
-
     public void Save() {
-        pluginInterface.SavePluginConfig(this);
+        Plugin.PluginInterface.SavePluginConfig(this);
     }
 }

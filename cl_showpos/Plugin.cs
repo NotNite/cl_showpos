@@ -1,66 +1,88 @@
 ﻿using System.Numerics;
+using cl_showpos.Windows;
 using Dalamud.Data;
 using Dalamud.Game;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
+using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using Lumina.Excel;
+using Lumina.Excel.GeneratedSheets;
 
-namespace cl_showpos {
-    public sealed class Plugin : IDalamudPlugin {
-        public string Name => "cl_showpos";
-        private const string CommandName = "/pshowpos";
+namespace cl_showpos;
 
-        [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
-        [PluginService] public static CommandManager CommandManager { get; private set; } = null!;
-        [PluginService] public static ClientState ClientState { get; private set; } = null!;
-        [PluginService] public static Framework Framework { get; private set; } = null!;
-        [PluginService] public static DataManager DataManager { get; private set; } = null!;
+public sealed class Plugin : IDalamudPlugin {
+    public string Name => "cl_showpos";
+    private const string CommandName = "/pshowpos";
 
-        public static Configuration Configuration { get; private set; } = null!;
-        public static Vector3 LastPosition = Vector3.Zero;
+    [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+    [PluginService] public static CommandManager CommandManager { get; private set; } = null!;
+    [PluginService] public static ClientState ClientState { get; private set; } = null!;
+    [PluginService] public static Framework Framework { get; private set; } = null!;
+    [PluginService] public static DataManager DataManager { get; private set; } = null!;
 
-        private PluginUi pluginUi = null!;
+    public static Configuration Configuration = null!;
 
-        public Plugin() {
-            Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            Configuration.Initialize(PluginInterface);
+    public static ExcelSheet<TerritoryType> TerritoryType = null!;
+    public static ExcelSheet<TerritoryTypeTransient> TerritoryTypeTransient = null!;
+    public static ExcelSheet<Map> Map = null!;
 
-            // cl_showpos was made before Dalamud windowing, so it's still using this method
-            // ...but given that it's a widget on the top of the screen, who cares?
-            this.pluginUi = new PluginUi();
+    public static Vector3 LastPosition = Vector3.Zero;
+    public static Vector3 CurrentPosition = Vector3.Zero;
 
-            CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand) {
-                HelpMessage = "Open the settings menu"
-            });
+    private WindowSystem windowSystem;
+    private ShowposWindow showposWindow;
+    private SettingsWindow settingsWindow;
 
-            PluginInterface.UiBuilder.Draw += this.DrawUi;
-            PluginInterface.UiBuilder.OpenConfigUi += this.DrawConfigUi;
+    public Plugin() {
+        Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
-            Framework.Update += OnFrameworkUpdate;
+        TerritoryType = DataManager.GetExcelSheet<TerritoryType>()!;
+        TerritoryTypeTransient = DataManager.GetExcelSheet<TerritoryTypeTransient>()!;
+        Map = DataManager.GetExcelSheet<Map>()!;
+
+        this.windowSystem = new("cl_showpos");
+
+        this.showposWindow = new();
+        this.settingsWindow = new();
+
+        this.windowSystem.AddWindow(this.showposWindow);
+        this.windowSystem.AddWindow(this.settingsWindow);
+
+        CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand) {
+            HelpMessage = "Open the settings menu"
+        });
+
+        PluginInterface.UiBuilder.Draw += this.DrawUi;
+        PluginInterface.UiBuilder.OpenConfigUi += this.DrawConfigUi;
+        Framework.Update += OnFrameworkUpdate;
+    }
+
+    public void Dispose() {
+        this.windowSystem.RemoveAllWindows();
+        CommandManager.RemoveHandler(CommandName);
+        PluginInterface.UiBuilder.Draw -= this.DrawUi;
+        PluginInterface.UiBuilder.OpenConfigUi -= this.DrawConfigUi;
+        Framework.Update -= OnFrameworkUpdate;
+    }
+
+    private void OnFrameworkUpdate(Framework framework) {
+        if (ClientState.LocalPlayer != null) {
+            LastPosition = CurrentPosition;
+            CurrentPosition = ClientState.LocalPlayer.Position;
         }
+    }
 
-        public void Dispose() {
-            this.pluginUi.Dispose();
-            CommandManager.RemoveHandler(CommandName);
-        }
+    private void OnCommand(string command, string args) {
+        this.DrawConfigUi();
+    }
 
-        private void OnFrameworkUpdate(Framework framework) {
-            if (ClientState.LocalPlayer != null) {
-                LastPosition = ClientState.LocalPlayer.Position;
-            }
-        }
+    private void DrawUi() {
+        this.windowSystem.Draw();
+    }
 
-        private void OnCommand(string command, string args) {
-            this.pluginUi.SettingsVisible = true;
-        }
-
-        private void DrawUi() {
-            this.pluginUi.Draw();
-        }
-
-        private void DrawConfigUi() {
-            this.pluginUi.SettingsVisible = true;
-        }
+    private void DrawConfigUi() {
+        this.settingsWindow.IsOpen ^= true;
     }
 }

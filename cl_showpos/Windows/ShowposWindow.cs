@@ -92,6 +92,8 @@ public class ShowposWindow : Window {
             var territory = Plugin.TerritoryType.GetRow(territoryId)!;
             var map = Plugin.Map.GetRow(Utils.CurrentMapId());
 
+            if (Plugin.Configuration.DrawName) str += $"name: {localPlayer.Name.TextValue}\n";
+
             var pos = localPlayer.Position.ToString(Plugin.Configuration.PositionPrecision);
             str += $"pos: {pos}\n";
 

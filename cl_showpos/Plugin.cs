@@ -7,6 +7,7 @@ using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 
@@ -17,10 +18,10 @@ public sealed class Plugin : IDalamudPlugin {
     private const string CommandName = "/pshowpos";
 
     [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
-    [PluginService] public static CommandManager CommandManager { get; private set; } = null!;
-    [PluginService] public static ClientState ClientState { get; private set; } = null!;
-    [PluginService] public static Framework Framework { get; private set; } = null!;
-    [PluginService] public static DataManager DataManager { get; private set; } = null!;
+    [PluginService] public static ICommandManager CommandManager { get; private set; } = null!;
+    [PluginService] public static IClientState ClientState { get; private set; } = null!;
+    [PluginService] public static IFramework Framework { get; private set; } = null!;
+    [PluginService] public static IDataManager DataManager { get; private set; } = null!;
 
     public static Configuration Configuration = null!;
 
@@ -67,7 +68,7 @@ public sealed class Plugin : IDalamudPlugin {
         Framework.Update -= OnFrameworkUpdate;
     }
 
-    private void OnFrameworkUpdate(Framework framework) {
+    private void OnFrameworkUpdate(IFramework framework) {
         if (ClientState.LocalPlayer != null) {
             LastPosition = CurrentPosition;
             CurrentPosition = ClientState.LocalPlayer.Position;

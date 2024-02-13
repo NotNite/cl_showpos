@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using Dalamud.Interface;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using Dalamud.Utility;
@@ -37,7 +38,7 @@ public class ShowposWindow : Window {
             var padding = ImGui.GetStyle().WindowPadding * 2;
             windowSize = (ImGui.CalcTextSize(this.nextStr) * Plugin.Configuration.FontSize) + padding;
         }
-        this.Size = windowSize;
+        this.Size = windowSize / ImGuiHelpers.GlobalScale;
 
         var viewport = ImGui.GetMainViewport();
         var windowPos = viewport.Pos;

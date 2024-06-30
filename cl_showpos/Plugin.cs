@@ -17,7 +17,7 @@ public sealed class Plugin : IDalamudPlugin {
     public string Name => "cl_showpos";
     private const string CommandName = "/pshowpos";
 
-    [PluginService] public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+    [PluginService] public static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] public static ICommandManager CommandManager { get; private set; } = null!;
     [PluginService] public static IClientState ClientState { get; private set; } = null!;
     [PluginService] public static IFramework Framework { get; private set; } = null!;

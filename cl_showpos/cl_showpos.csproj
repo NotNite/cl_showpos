@@ -1,11 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="Dalamud.Plugin.Bootstrap.targets"/>
-
+<Project Sdk="Dalamud.NET.Sdk/11.0.0">
     <PropertyGroup>
         <Authors>NotNite</Authors>
-        <Version>1.1.0.2</Version>
-        <PackageProjectUrl>https://github.com/NotNite/cl_showpos</PackageProjectUrl>
-        <RootNamespace>cl_showpos</RootNamespace>
+        <Version>1.1.0.3</Version>
     </PropertyGroup>
 </Project>

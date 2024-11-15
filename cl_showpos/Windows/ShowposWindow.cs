@@ -91,7 +91,6 @@ public class ShowposWindow : Window {
         } else {
             var territoryId = Plugin.ClientState.TerritoryType;
             var territory = Plugin.TerritoryType.GetRow(territoryId)!;
-            var map = Plugin.Map.GetRow(Utils.CurrentMapId());
 
             if (Plugin.Configuration.DrawName) str += $"name: {localPlayer.Name.TextValue}\n";
 
@@ -99,11 +98,13 @@ public class ShowposWindow : Window {
             str += $"pos: {pos}\n";
 
             if (Plugin.Configuration.DrawMapCoords) {
-                if (map is not null) {
-                    var ttc = Plugin.TerritoryTypeTransient.GetRow(map.TerritoryType.Row);
+                if (Plugin.Map.TryGetRow(Utils.CurrentMapId(), out var map)) {
+                    var offsetZ = Plugin.TerritoryTypeTransient.TryGetRow(map.TerritoryType.RowId, out var ttcRow)
+                                      ? ttcRow.OffsetZ
+                                      : 0;
                     var mapCoords = MapUtil.WorldToMap(
                         localPlayer.Position, map.OffsetX, map.OffsetY,
-                        ttc?.OffsetZ ?? 0, map.SizeFactor, true);
+                        offsetZ, map.SizeFactor, true);
                     var crd = mapCoords.ToString(Plugin.Configuration.PositionPrecision, true);
                     str += $"crd: {crd}\n";
                 } else {
@@ -130,8 +131,8 @@ public class ShowposWindow : Window {
                 str += $"teri: {teri}\n";
 
                 if (Plugin.Configuration.DrawTerritoryName) {
-                    var region = territory.PlaceNameRegion.Value?.Name?.ToDalamudString().TextValue ?? "???";
-                    var place = territory.PlaceName.Value?.Name?.ToDalamudString().TextValue ?? "???";
+                    var region = territory.PlaceNameRegion.ValueNullable?.Name.ExtractText() ?? "???";
+                    var place = territory.PlaceName.ValueNullable?.Name.ExtractText() ?? "???";
                     var tern = $"{region} > {place}";
                     str += $"tern: {tern}\n";
                 }

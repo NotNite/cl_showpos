@@ -1,20 +1,16 @@
 ﻿using System.Numerics;
 using cl_showpos.Windows;
-using Dalamud.Data;
-using Dalamud.Game;
-using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 
 namespace cl_showpos;
 
 public sealed class Plugin : IDalamudPlugin {
-    public string Name => "cl_showpos";
     private const string CommandName = "/pshowpos";
 
     [PluginService] public static IDalamudPluginInterface PluginInterface { get; private set; } = null!;

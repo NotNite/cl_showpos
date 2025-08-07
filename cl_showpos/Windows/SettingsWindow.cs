@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Numerics;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace cl_showpos.Windows;
 
@@ -49,11 +50,10 @@ public class SettingsWindow : Window {
             Plugin.Configuration.Save();
         }
 
-        // https://github.com/mellinoe/ImGui.NET/issues/181 ???
-        var wtfImguiNet = new[] {Plugin.Configuration.OffsetX, Plugin.Configuration.OffsetY};
-        if (ImGui.InputInt2("Offset", ref wtfImguiNet[0])) {
-            Plugin.Configuration.OffsetX = wtfImguiNet[0];
-            Plugin.Configuration.OffsetY = wtfImguiNet[1];
+        Span<int> offset = [Plugin.Configuration.OffsetX, Plugin.Configuration.OffsetY];
+        if (ImGui.InputInt("Offset", offset)) {
+            Plugin.Configuration.OffsetX = offset[0];
+            Plugin.Configuration.OffsetY = offset[1];
             Plugin.Configuration.Save();
         }
 

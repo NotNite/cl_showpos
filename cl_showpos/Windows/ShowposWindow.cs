@@ -43,10 +43,11 @@ public class ShowposWindow : Window {
         var viewport = ImGui.GetMainViewport();
         var windowPos = viewport.Pos;
         var screenSize = viewport.Size;
+        var topSafeArea = Plugin.PluginInterface.IsDevMenuOpen ? ImGui.GetFrameHeight() : 0;
 
         windowPos += Plugin.Configuration.Position switch {
-            ShowposPosition.TopLeft => new Vector2(0, 0),
-            ShowposPosition.TopRight => new Vector2(screenSize.X - windowSize.X, 0),
+            ShowposPosition.TopLeft => new Vector2(0, topSafeArea),
+            ShowposPosition.TopRight => new Vector2(screenSize.X - windowSize.X, topSafeArea),
             ShowposPosition.BottomLeft => new Vector2(0, screenSize.Y - windowSize.Y),
             ShowposPosition.BottomRight => new Vector2(screenSize.X - windowSize.X, screenSize.Y - windowSize.Y),
             _ => windowPos

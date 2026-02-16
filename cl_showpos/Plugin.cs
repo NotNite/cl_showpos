@@ -16,6 +16,7 @@ public sealed class Plugin : IDalamudPlugin {
     [PluginService] public static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] public static ICommandManager CommandManager { get; private set; } = null!;
     [PluginService] public static IClientState ClientState { get; private set; } = null!;
+    [PluginService] public static IObjectTable ObjectTable { get; private set; } = null!;
     [PluginService] public static IFramework Framework { get; private set; } = null!;
     [PluginService] public static IDataManager DataManager { get; private set; } = null!;
 
@@ -65,9 +66,9 @@ public sealed class Plugin : IDalamudPlugin {
     }
 
     private void OnFrameworkUpdate(IFramework framework) {
-        if (ClientState.LocalPlayer != null) {
+        if (ObjectTable.LocalPlayer is { } player) {
             LastPosition = CurrentPosition;
-            CurrentPosition = ClientState.LocalPlayer.Position;
+            CurrentPosition = player.Position;
         }
     }
 

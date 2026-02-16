@@ -66,7 +66,7 @@ public class ShowposWindow : Window {
     }
 
     private string CreateString() {
-        var localPlayer = Plugin.ClientState.LocalPlayer;
+        var localPlayer = Plugin.ObjectTable.LocalPlayer;
         var zero = 0.ToString($"F{Plugin.Configuration.PositionPrecision}");
         var str = "";
 

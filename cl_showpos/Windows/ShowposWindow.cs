@@ -65,6 +65,8 @@ public class ShowposWindow : Window {
         }
     }
 
+    public override bool DrawConditions() => Plugin.Configuration.DrawShowpos;
+
     private string CreateString() {
         var localPlayer = Plugin.ObjectTable.LocalPlayer;
         var zero = 0.ToString($"F{Plugin.Configuration.PositionPrecision}");
